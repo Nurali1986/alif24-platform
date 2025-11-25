@@ -13,7 +13,7 @@
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-org/alif24-platform.git
+   git clone https://github.com/Nurali1986/alif24-platform.git
    cd alif24-platform
    ```
 

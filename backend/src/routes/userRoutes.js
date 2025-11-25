@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { userController } from '../controllers/index.js';
-import { authenticate, adminOnly, validateBody, validateQuery, validateParams } from '../middleware/index.js';
+import { authenticate, adminOnly, validateBody, validateQuery, validateParams, generalLimiter } from '../middleware/index.js';
 import { updateUserSchema, userIdParamSchema, searchUsersSchema } from '../validators/index.js';
 
 const router = Router();
@@ -10,7 +10,8 @@ const router = Router();
  * /api/v1/users
  */
 
-// All routes require authentication
+// All routes require authentication and rate limiting
+router.use(generalLimiter);
 router.use(authenticate);
 
 // Search users (admin only)

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
-import { Button } from '../../components/Common';
-import CatAnimation from '../../components/Auth/CatAnimation';
+import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import { Button } from '../components/Common';
+import CatAnimation from '../components/Auth/CatAnimation';
 import './Auth.css';
 
 /**

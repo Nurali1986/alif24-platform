@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { studentController } from '../controllers/index.js';
-import { authenticate, studentOnly, parentOfStudent, adminOnly, validateBody, validateParams } from '../middleware/index.js';
+import { authenticate, studentOnly, parentOfStudent, adminOnly, validateBody, validateParams, generalLimiter } from '../middleware/index.js';
 import { createStudentProfileSchema, updateStudentProfileSchema, studentIdParamSchema } from '../validators/index.js';
 
 const router = Router();
@@ -10,7 +10,8 @@ const router = Router();
  * /api/v1/students
  */
 
-// All routes require authentication
+// All routes require authentication and rate limiting
+router.use(generalLimiter);
 router.use(authenticate);
 
 // Get my profile (student only)

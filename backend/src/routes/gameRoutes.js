@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { gameController } from '../controllers/index.js';
-import { authenticate, teacherOrAdmin, studentOnly, validateBody, validateQuery, validateParams } from '../middleware/index.js';
+import { authenticate, teacherOrAdmin, studentOnly, validateBody, validateQuery, validateParams, generalLimiter, gameLimiter } from '../middleware/index.js';
 import { createGameSchema, updateGameSchema, gameIdParamSchema, getGamesQuerySchema, startGameSessionSchema, endGameSessionSchema, gameSessionIdParamSchema } from '../validators/index.js';
 
 const router = Router();
@@ -10,25 +10,25 @@ const router = Router();
  * /api/v1/games
  */
 
-// Public routes
-router.get('/', validateQuery(getGamesQuerySchema), gameController.getAll);
-router.get('/:id', validateParams(gameIdParamSchema), gameController.getById);
+// Public routes with rate limiting
+router.get('/', generalLimiter, validateQuery(getGamesQuerySchema), gameController.getAll);
+router.get('/:id', generalLimiter, validateParams(gameIdParamSchema), gameController.getById);
 
-// Protected routes
+// Protected routes - apply authentication
 router.use(authenticate);
 
-// Student routes
-router.get('/for-me', studentOnly, gameController.getForStudent);
-router.get('/my-sessions', studentOnly, gameController.getMySessions);
-router.post('/:id/start', studentOnly, validateParams(gameIdParamSchema), validateBody(startGameSessionSchema), gameController.startSession);
+// Student routes - with game rate limiting
+router.get('/for-me', gameLimiter, studentOnly, gameController.getForStudent);
+router.get('/my-sessions', gameLimiter, studentOnly, gameController.getMySessions);
+router.post('/:id/start', gameLimiter, studentOnly, validateParams(gameIdParamSchema), validateBody(startGameSessionSchema), gameController.startSession);
 
-// Game session routes
-router.get('/sessions/:sessionId', validateParams(gameSessionIdParamSchema), gameController.getSession);
-router.post('/sessions/:sessionId/end', validateParams(gameSessionIdParamSchema), validateBody(endGameSessionSchema), gameController.endSession);
+// Game session routes - with game rate limiting
+router.get('/sessions/:sessionId', gameLimiter, validateParams(gameSessionIdParamSchema), gameController.getSession);
+router.post('/sessions/:sessionId/end', gameLimiter, validateParams(gameSessionIdParamSchema), validateBody(endGameSessionSchema), gameController.endSession);
 
-// Admin routes
-router.post('/', teacherOrAdmin, validateBody(createGameSchema), gameController.create);
-router.put('/:id', teacherOrAdmin, validateParams(gameIdParamSchema), validateBody(updateGameSchema), gameController.update);
-router.delete('/:id', teacherOrAdmin, validateParams(gameIdParamSchema), gameController.delete);
+// Admin routes - with general rate limiting
+router.post('/', generalLimiter, teacherOrAdmin, validateBody(createGameSchema), gameController.create);
+router.put('/:id', generalLimiter, teacherOrAdmin, validateParams(gameIdParamSchema), validateBody(updateGameSchema), gameController.update);
+router.delete('/:id', generalLimiter, teacherOrAdmin, validateParams(gameIdParamSchema), gameController.delete);
 
 export default router;
